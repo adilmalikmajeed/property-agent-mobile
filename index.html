@@ -9,21 +9,13 @@
     .container { max-width: 480px; margin: 0 auto; }
     h2 { color: #38bdf8; font-size: 24px; margin-bottom: 5px; }
     .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
-    
     textarea.input-data { width: 100%; height: 120px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: white; padding: 12px; box-sizing: border-box; font-size: 14px; resize: none; margin-bottom: 12px; }
-    
-    button { background-color: #38bdf8; color: #0f172a; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(56, 189, 248, 0.2); }
-    button:active { transform: scale(0.98); }
-
+    button { background-color: #38bdf8; color: #0f172a; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
     .result-card { background: #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #334155; display: none; }
-    .section-title { color: #38bdf8; font-size: 16px; font-weight: bold; margin-bottom: 10px; }
-    
+    .section-title { color: #38bdf8; font-size: 16px; font-weight: bold; margin-bottom: 10px; margin-top: 15px; }
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
     .metric-item { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
     .metric-val { color: #4ade80; font-size: 18px; font-weight: bold; }
-    
-    .risk-alert { background: #291b1a; border-left: 4px solid #ef4444; padding: 12px; border-radius: 6px; font-size: 13px; color: #fca5a5; }
-    
     .email-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-size: 13px; white-space: pre-wrap; margin-top: 10px; }
   </style>
 </head>
@@ -33,31 +25,24 @@
     <h2>🏠 Property Agent Pro</h2>
     <div class="subtitle">Mobile Investment Suite</div>
 
-    <!-- User Input Section -->
-    <textarea class="input-data" id="propertyText" placeholder="Paste the property details, description, or raw text here..."></textarea>
+    <textarea class="input-data" id="propertyText" placeholder="Paste the property details here... (Include Price: £XXX and Rent: £XXX to test the smart calculator)"></textarea>
     <button id="analyzeBtn" onclick="runMobileAnalysis()">🚀 Analyze Property</button>
 
-    <!-- Beautiful Dashboard Results (Hidden until clicked) -->
     <div class="result-card" id="resultsDashboard">
-      <div class="section-title">📊 Investment Analytics</div>
+      <div class="section-title">📊 Live Investment Analytics</div>
       <div class="metric-grid">
         <div class="metric-item">
-          <div style="font-size: 11px; color: #94a3b8;">Est. Gross Yield</div>
-          <div class="metric-val">🔥 8.2%</div>
+          <div style="font-size: 11px; color: #94a3b8;">Calculated Gross Yield</div>
+          <div class="metric-val" id="yieldOutput">0.0%</div>
         </div>
         <div class="metric-item">
-          <div style="font-size: 11px; color: #94a3b8;">Net Cashflow</div>
-          <div class="metric-val">💸 +£480/mo</div>
+          <div style="font-size: 11px; color: #94a3b8;">Annual Gross Rent</div>
+          <div class="metric-val" id="annualRentOutput">£0</div>
         </div>
       </div>
 
-      <div class="section-title">⚠️ Risk Assessment</div>
-      <div class="risk-alert">
-        <b>Analyst Warning:</b> High student numbers in this postcode can lead to summer vacancies. Factor in a 1-month buffer.
-      </div>
-      
-      <div class="section-title" style="margin-top: 15px;">✉️ Generated Agent Outreach</div>
-      <div class="email-box" id="emailDraft">Loading personalized script...</div>
+      <div class="section-title">✉️ Generated Agent Outreach</div>
+      <div class="email-box" id="emailDraft">Generating script...</div>
       <button style="background: #334155; color: white; margin-top: 10px; font-size: 14px; padding: 10px;" onclick="copyEmail()">📋 Copy Email</button>
     </div>
   </div>
@@ -67,18 +52,31 @@
       const text = document.getElementById('propertyText').value;
       if(!text) { alert('Please paste some property text first!'); return; }
       
-      // Simulating backend agent response for the UI preview
-      document.getElementById('resultsDashboard').style.display = 'block';
-      document.getElementById('emailDraft').innerText = "Hi Team,\n\nI am writing to inquire about the property details listed. I am an active investor looking to move quickly on properties meeting my yield targets in this specific neighborhood...\n\nBest,\n[Investor]";
+      // 1. Smart UI: Automatically look for numbers in the text block
+      const priceMatch = text.match(/Price:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+[\d])/);
+      const rentMatch = text.match(/Rent:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+)\s*pcm/i);
       
-      // Scroll smoothly down to the results
+      let price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 150000; // default backup
+      let rent = rentMatch ? parseFloat(rentMatch[1].replace(/,/g, '')) : 1200; // default backup
+      
+      // 2. Run the dynamic real estate math instantly
+      let annualRent = rent * 12;
+      let grossYield = (annualRent / price) * 100;
+      
+      // 3. Update the HTML layout smoothly
+      document.getElementById('yieldOutput').innerText = `🔥 ${grossYield.toFixed(1)}%`;
+      document.getElementById('annualRentOutput').innerText = `£${annualRent.toLocaleString()}`;
+      
+      // 4. Update the tailored email template
+      document.getElementById('emailDraft').innerText = `Hi Team,\n\nI am analyzing your listing with a target purchase price of £${price.toLocaleString()}. I would love to schedule a viewing context layout for this week.\n\nBest,\n[Investor]`;
+      
+      document.getElementById('resultsDashboard').style.display = 'block';
       document.getElementById('resultsDashboard').scrollIntoView({ behavior: 'smooth' });
     }
 
     function copyEmail() {
-      const text = document.getElementById('emailDraft').innerText;
-      navigator.clipboard.writeText(text);
-      alert('Email copied to phone clipboard!');
+      navigator.clipboard.writeText(document.getElementById('emailDraft').innerText);
+      alert('Email copied to clipboard!');
     }
   </script>
 </body>

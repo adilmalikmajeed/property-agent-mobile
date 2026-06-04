@@ -16,6 +16,7 @@
     .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
     .metric-item { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
     .metric-val { color: #4ade80; font-size: 18px; font-weight: bold; }
+    .risk-box { background: #291b1a; border-left: 4px solid #ef4444; padding: 12px; border-radius: 6px; font-size: 13px; color: #fca5a5; margin-bottom: 15px; }
     .email-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-size: 13px; white-space: pre-wrap; margin-top: 10px; }
   </style>
 </head>
@@ -23,9 +24,9 @@
 
   <div class="container">
     <h2>🏠 Property Agent Pro</h2>
-    <div class="subtitle">Mobile Investment Suite</div>
+    <div class="subtitle">Mobile & Desktop Investment Suite</div>
 
-    <textarea class="input-data" id="propertyText" placeholder="Paste the property details here... (Include Price: £XXX and Rent: £XXX to test the smart calculator)"></textarea>
+    <textarea class="input-data" id="propertyText" placeholder="Paste property text layout here... (Include Price: £XXX and Rent: £XXX to test the math)"></textarea>
     <button id="analyzeBtn" onclick="runMobileAnalysis()">🚀 Analyze Property</button>
 
     <div class="result-card" id="resultsDashboard">
@@ -41,6 +42,9 @@
         </div>
       </div>
 
+      <div class="section-title">⚠️ AI Risk Analyst Warning</div>
+      <div class="risk-box" id="riskOutput">AI Agent is thinking...</div>
+
       <div class="section-title">✉️ Generated Agent Outreach</div>
       <div class="email-box" id="emailDraft">Generating script...</div>
       <button style="background: #334155; color: white; margin-top: 10px; font-size: 14px; padding: 10px;" onclick="copyEmail()">📋 Copy Email</button>
@@ -48,30 +52,86 @@
   </div>
 
   <script>
-    function runMobileAnalysis() {
+    // 🔴 SECURITY REMINDER: Paste your OpenAI API Key here for private testing.
+    // Replace the placeholder below with your real key starting with "sk-proj-..."
+    const OPENAI_API_KEY = "PASTE_YOUR_OPENAI_KEY_HERE";
+
+    // WORKAROUND HACK: Detects if a URL was passed from your browser's address bar shortcut
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passedUrl = urlParams.get('url');
+        
+        if (passedUrl) {
+            document.getElementById('propertyText').value = `Processing Rightmove URL link: ${passedUrl}\n\nPlease paste the text snippet layout from that page below to execute full AI extraction logic automatically!`;
+            document.getElementById('resultsDashboard').style.display = 'block';
+            document.getElementById('resultsDashboard').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+
+    async function runMobileAnalysis() {
       const text = document.getElementById('propertyText').value;
       if(!text) { alert('Please paste some property text first!'); return; }
       
-      // 1. Smart UI: Automatically look for numbers in the text block
+      // Show loading elements
+      document.getElementById('resultsDashboard').style.display = 'block';
+      document.getElementById('riskOutput').innerText = "🔄 Scanning property text layout...";
+      document.getElementById('emailDraft').innerText = "🔄 Structuring premium email template...";
+      
+      // 1. Smart UI Local Number Extract Layout Check
       const priceMatch = text.match(/Price:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+[\d])/);
       const rentMatch = text.match(/Rent:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+)\s*pcm/i);
       
-      let price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 150000; // default backup
-      let rent = rentMatch ? parseFloat(rentMatch[1].replace(/,/g, '')) : 1200; // default backup
+      let price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 150000;
+      let rent = rentMatch ? parseFloat(rentMatch[1].replace(/,/g, '')) : 1200;
       
-      // 2. Run the dynamic real estate math instantly
       let annualRent = rent * 12;
       let grossYield = (annualRent / price) * 100;
       
-      // 3. Update the HTML layout smoothly
       document.getElementById('yieldOutput').innerText = `🔥 ${grossYield.toFixed(1)}%`;
       document.getElementById('annualRentOutput').innerText = `£${annualRent.toLocaleString()}`;
       
-      // 4. Update the tailored email template
-      document.getElementById('emailDraft').innerText = `Hi Team,\n\nI am analyzing your listing with a target purchase price of £${price.toLocaleString()}. I would love to schedule a viewing context layout for this week.\n\nBest,\n[Investor]`;
-      
-      document.getElementById('resultsDashboard').style.display = 'block';
-      document.getElementById('resultsDashboard').scrollIntoView({ behavior: 'smooth' });
+      // 2. Live OpenAI API Integration Tunnel Connection
+      try {
+        const response = await fetch("https://openai.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini", // Blazing fast and ultra cheap
+            messages: [
+              { 
+                role: "system", 
+                content: "You are a professional real estate investment multi-agent system split into a Risk Analyst and an Accountant. Analyze the property text. First, write a one-sentence warning starting with 'RISK SUMMARY:' highlighting hidden flaws (e.g. Grade listings, student turnover, hidden fees). Second, write an email template starting with 'EMAIL DRAFT:' to schedule a property viewing with the estate agents." 
+              },
+              { role: "user", content: `Raw text data: ${text}\nPrice: £${price}, Rent: £${rent}` }
+            ]
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.choices && data.choices[0]) {
+          const aiResponse = data.choices[0].message.content;
+          
+          // Separate the AI response into the Risk box and Email box layout
+          if (aiResponse.includes("EMAIL DRAFT:")) {
+            const parts = aiResponse.split("EMAIL DRAFT:");
+            document.getElementById('riskOutput').innerText = parts[0].replace("RISK SUMMARY:", "").trim();
+            document.getElementById('emailDraft').innerText = parts[1].trim();
+          } else {
+            document.getElementById('riskOutput').innerText = "Analysis Complete.";
+            document.getElementById('emailDraft').innerText = aiResponse;
+          }
+        } else {
+          document.getElementById('riskOutput').innerText = "API Configuration Error";
+          document.getElementById('emailDraft').innerText = "Check your OpenAI credits or Key: " + JSON.stringify(data.error);
+        }
+      } catch (error) {
+        document.getElementById('riskOutput').innerText = "Connection Dropped";
+        document.getElementById('emailDraft').innerText = "Failed to tunnel to OpenAI servers: " + error.message;
+      }
     }
 
     function copyEmail() {

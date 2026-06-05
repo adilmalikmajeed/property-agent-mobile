@@ -1,143 +1,689 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Property Agent Pro Mobile</title>
-  <style>
-    body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; margin: 0; background-color: #0f172a; color: #f8fafc; }
-    .container { max-width: 480px; margin: 0 auto; }
-    h2 { color: #38bdf8; font-size: 24px; margin-bottom: 5px; }
-    .subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
-    textarea.input-data { width: 100%; height: 120px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; color: white; padding: 12px; box-sizing: border-box; font-size: 14px; resize: none; margin-bottom: 12px; }
-    button { background-color: #38bdf8; color: #0f172a; border: none; padding: 14px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-bottom: 20px; }
-    .result-card { background: #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #334155; display: none; }
-    .section-title { color: #38bdf8; font-size: 16px; font-weight: bold; margin-bottom: 10px; margin-top: 15px; }
-    .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-    .metric-item { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; }
-    .metric-val { color: #4ade80; font-size: 18px; font-weight: bold; }
-    .risk-box { background: #291b1a; border-left: 4px solid #ef4444; padding: 12px; border-radius: 6px; font-size: 13px; color: #fca5a5; margin-bottom: 15px; }
-    .email-box { background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid #334155; font-size: 13px; white-space: pre-wrap; margin-top: 10px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Property Analyst Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --accent: #7c6af7;
+    --accent2: #4fc3a1;
+    --text: #f0effe;
+    --muted: #7a7898;
+    --danger: #f87171;
+    --warn: #fbbf24;
+    --good: #34d399;
+    --mono: 'DM Mono', monospace;
+    --display: 'Syne', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--mono); min-height: 100vh; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-family: var(--display); font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; }
+  .logo span { color: var(--accent); }
+  .badge { font-size: 0.65rem; background: var(--surface2); border: 1px solid var(--border2); padding: 3px 10px; border-radius: 20px; color: var(--muted); }
+
+  .hero { padding: 3rem 2rem 2rem; max-width: 900px; margin: 0 auto; }
+  h1 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; margin-bottom: 0.75rem; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .sub { color: var(--muted); font-size: 0.85rem; line-height: 1.7; max-width: 560px; }
+
+  .steps {
+    display: flex; gap: 1rem; margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    flex: 1; min-width: 180px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 0.7rem; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .step p { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
+  .step strong { display: block; font-size: 0.82rem; color: var(--text); margin-bottom: 3px; }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+  .bookmarklet-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .bookmarklet-box h3 { font-family: var(--display); font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .bookmarklet-box p { font-size: 0.78rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+  .bm-code {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    word-break: break-all;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    cursor: text;
+    user-select: all;
+  }
+  .bm-drag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--display);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: grab;
+    text-decoration: none;
+    border: none;
+  }
+  .bm-drag:active { cursor: grabbing; }
+
+  .input-section { margin-bottom: 2rem; }
+  .input-section label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 1rem;
+    resize: vertical;
+    min-height: 160px;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .controls { display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: var(--display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-sec {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-sec:hover { color: var(--text); border-color: var(--border2); }
+
+  .status-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 1rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #results { display: none; }
+
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .summary-card .sc-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .summary-card .sc-val { font-family: var(--display); font-size: 1.4rem; font-weight: 800; }
+
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .section-head h2 { font-family: var(--display); font-size: 1rem; font-weight: 700; }
+
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    cursor: pointer;
+    font-family: var(--mono);
+    transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .table-wrap { overflow-x: auto; margin-bottom: 2rem; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  thead th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  thead th:hover { color: var(--text); }
+  thead th.sort-asc::after { content: ' ↑'; color: var(--accent); }
+  thead th.sort-desc::after { content: ' ↓'; color: var(--accent); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 12px 14px; vertical-align: middle; }
+  .prop-name { font-weight: 500; color: var(--text); }
+  .prop-addr { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .pill {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 500;
+  }
+  .pill-good { background: rgba(52,211,153,0.12); color: var(--good); }
+  .pill-warn { background: rgba(251,191,36,0.12); color: var(--warn); }
+  .pill-bad  { background: rgba(248,113,113,0.12); color: var(--danger); }
+  .pill-neu  { background: var(--surface2); color: var(--muted); }
+
+  .best-val { color: var(--good); font-weight: 500; }
+  .worst-val { color: var(--danger); }
+
+  .ai-insights {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .ai-insights h3 { font-family: var(--display); font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--accent); }
+  .ai-insights p { font-size: 0.8rem; color: var(--muted); line-height: 1.8; }
+
+  .top-pick {
+    background: linear-gradient(135deg, rgba(124,106,247,0.08), rgba(79,195,161,0.06));
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;
+  }
+  .top-pick-icon { font-size: 1.8rem; }
+  .top-pick h3 { font-family: var(--display); font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+  .top-pick p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  .email-section { margin-bottom: 2rem; }
+  .email-select { margin-bottom: 0.75rem; }
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    outline: none;
+    cursor: pointer;
+  }
+  .email-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    min-height: 120px;
+  }
+
+  .error-box {
+    background: rgba(248,113,113,0.08);
+    border: 1px solid rgba(248,113,113,0.25);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    color: var(--danger);
+    font-size: 0.8rem;
+    display: none;
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+
+  footer { border-top: 1px solid var(--border); padding: 1.5rem 2rem; text-align: center; font-size: 0.72rem; color: var(--muted); }
+
+  @media(max-width:600px) {
+    header, .hero, .main { padding-left: 1rem; padding-right: 1rem; }
+    h1 { font-size: 1.6rem; }
+  }
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>🏠 Property Agent Pro</h2>
-    <div class="subtitle">Mobile & Desktop Investment Suite</div>
+<header>
+  <div class="logo">Property<span>Analyst</span></div>
+  <span class="badge">browser-side only · no data stored</span>
+</header>
 
-    <textarea class="input-data" id="propertyText" placeholder="Paste property text layout here... (Include Price: £XXX and Rent: £XXX to test the math)"></textarea>
-    <button id="analyzeBtn" onclick="runMobileAnalysis()">🚀 Analyze Property</button>
+<div class="hero">
+  <h1>Compare every listing.<br><em>Instantly.</em></h1>
+  <p class="sub">Open any property search results page, click the bookmarklet, and get a full side-by-side investment comparison table — no extensions, no developer mode required.</p>
 
-    <div class="result-card" id="resultsDashboard">
-      <div class="section-title">📊 Live Investment Analytics</div>
-      <div class="metric-grid">
-        <div class="metric-item">
-          <div style="font-size: 11px; color: #94a3b8;">Calculated Gross Yield</div>
-          <div class="metric-val" id="yieldOutput">0.0%</div>
-        </div>
-        <div class="metric-item">
-          <div style="font-size: 11px; color: #94a3b8;">Annual Gross Rent</div>
-          <div class="metric-val" id="annualRentOutput">£0</div>
-        </div>
-      </div>
-
-      <div class="section-title">⚠️ AI Risk Analyst Warning</div>
-      <div class="risk-box" id="riskOutput">AI Agent is thinking...</div>
-
-      <div class="section-title">✉️ Generated Agent Outreach</div>
-      <div class="email-box" id="emailDraft">Generating script...</div>
-      <button style="background: #334155; color: white; margin-top: 10px; font-size: 14px; padding: 10px;" onclick="copyEmail()">📋 Copy Email</button>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div><strong>Add the bookmarklet</strong><p>Drag the button below into your browser bookmarks bar once.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div><strong>Open any listings page</strong><p>Go to Rightmove, Zoopla, OnTheMarket — any page with multiple properties.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div><strong>Click the bookmarklet</strong><p>It reads the page already loaded in your browser and sends you here.</p></div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div><strong>Get your table</strong><p>Full comparison with yield, price per sqft, AI insights and email drafts.</p></div>
     </div>
   </div>
+</div>
 
-  <script>
-    // 🔴 SECURITY REMINDER: Paste your OpenAI API Key here for private testing.
-    // Replace the placeholder below with your real key starting with "sk-proj-..."
-    const OPENAI_API_KEY = "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";
+<div class="main">
 
-    // WORKAROUND HACK: Detects if a URL was passed from your browser's address bar shortcut
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const passedUrl = urlParams.get('url');
-        
-        if (passedUrl) {
-            document.getElementById('propertyText').value = `Processing Rightmove URL link: ${passedUrl}\n\nPlease paste the text snippet layout from that page below to execute full AI extraction logic automatically!`;
-            document.getElementById('resultsDashboard').style.display = 'block';
-            document.getElementById('resultsDashboard').scrollIntoView({ behavior: 'smooth' });
-        }
+  <div class="bookmarklet-box">
+    <h3>Your bookmarklet</h3>
+    <p>Drag this button into your bookmarks bar. On any property listings page, click it — it will read what's already on screen and open your analysis here.</p>
+    <div class="bm-code" id="bm-code-display">Loading bookmarklet code...</div>
+    <a class="bm-drag" id="bm-link" href="#">&#x1F3E0; Analyse Properties</a>
+    &nbsp;
+    <button class="btn-sec" onclick="copyBookmarklet()">Copy code</button>
+  </div>
+
+  <div class="input-section">
+    <label>Or paste property page text directly</label>
+    <textarea id="rawText" placeholder="Paste text copied from a property listings page here. Include prices, addresses, bedrooms, and any other details visible on the page.&#10;&#10;Example:&#10;24 Maple Street, Manchester — 3 bed terraced — £185,000 — Est. rent £950 pcm&#10;7 Oak Avenue, Salford — 2 bed flat — £145,000 — Est. rent £750 pcm&#10;..."></textarea>
+    <div class="controls">
+      <button class="btn-primary" id="analyzeBtn" onclick="runAnalysis()">Analyse properties</button>
+      <button class="btn-sec" onclick="loadDemo()">Load demo data</button>
+      <button class="btn-sec" onclick="clearAll()">Clear</button>
+    </div>
+    <div class="status-bar" id="statusBar">
+      <div class="spinner"></div>
+      <span id="statusText">Analysing with AI...</span>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <div id="results">
+
+    <div class="summary-strip" id="summaryStrip"></div>
+
+    <div class="top-pick" id="topPick" style="display:none">
+      <div class="top-pick-icon">★</div>
+      <div>
+        <h3 id="topPickTitle">Best investment pick</h3>
+        <p id="topPickDesc"></p>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Comparison table</h2>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setSort('yield')">Sort: yield</button>
+        <button class="filter-btn" onclick="setSort('price')">Sort: price</button>
+        <button class="filter-btn" onclick="setSort('beds')">Sort: beds</button>
+        <button class="filter-btn" onclick="setSort('roi')">Sort: ROI</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="compTable">
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th onclick="setSort('price')">Price</th>
+            <th onclick="setSort('beds')">Beds</th>
+            <th>Type</th>
+            <th>Est. rent/mo</th>
+            <th onclick="setSort('yield')">Gross yield</th>
+            <th>Annual income</th>
+            <th onclick="setSort('roi')">5yr ROI est.</th>
+            <th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody id="compBody"></tbody>
+      </table>
+    </div>
+
+    <div class="ai-insights" id="aiInsights" style="display:none">
+      <h3>AI analyst notes</h3>
+      <p id="aiInsightsText"></p>
+    </div>
+
+    <div class="email-section">
+      <div class="section-head"><h2>Agent email drafts</h2></div>
+      <div class="email-select">
+        <select id="emailSelect" onchange="showEmail()">
+          <option value="">Select a property...</option>
+        </select>
+      </div>
+      <div class="email-body" id="emailBody">Select a property above to generate a viewing request email.</div>
+      <div class="controls" style="margin-top:0.75rem">
+        <button class="btn-sec" onclick="copyEmail()">Copy email</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>PropertyAnalyst · All analysis is done in your browser · No data is sent to any server except the AI analysis call · Not financial advice</footer>
+
+<script>
+const APP_URL = window.location.href.split('?')[0];
+
+const BOOKMARKLET = `javascript:(function(){
+  var t=document.body.innerText.substring(0,12000);
+  var u=encodeURIComponent(t);
+  var dest='${APP_URL}?pagedata='+u;
+  window.open(dest,'_blank');
+})();`;
+
+document.getElementById('bm-code-display').textContent = BOOKMARKLET;
+document.getElementById('bm-link').href = BOOKMARKLET;
+
+function copyBookmarklet() {
+  navigator.clipboard.writeText(BOOKMARKLET).then(() => alert('Bookmarklet code copied! Create a new bookmark and paste this as the URL.'));
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('pagedata')) {
+  const decoded = decodeURIComponent(params.get('pagedata'));
+  document.getElementById('rawText').value = decoded;
+  setTimeout(runAnalysis, 400);
+}
+
+let properties = [];
+let sortKey = 'yield';
+
+const DEMO = `Rightmove Search Results — Manchester
+
+1. 14 Birchwood Close, Stretford, Manchester M32 8PL
+   3 bedroom semi-detached house
+   £210,000 • Offers over
+   Estimated rental income: £1,050 pcm
+   Recently renovated kitchen. Gas central heating. Double garage.
+
+2. Flat 6, Victoria Mill, Ancoats, Manchester M4 6EU
+   2 bedroom apartment
+   £175,000 • Fixed price
+   Estimated rental income: £950 pcm
+   City centre location. Concierge. Leasehold 150 yrs. Service charge £1,800/yr.
+
+3. 88 Longford Road, Chorlton, Manchester M21 9RG
+   4 bedroom terraced house
+   £295,000
+   Estimated rental income: £1,400 pcm
+   Popular area. Good schools. HMO potential (subject to planning).
+
+4. 22 Dale Street, Salford M5 3JQ
+   1 bedroom flat
+   £98,000
+   Estimated rental income: £600 pcm
+   Near MediaCityUK. New build. Leasehold. Ground rent £250/yr.
+
+5. 9 Hesketh Avenue, Didsbury M20 6RP
+   5 bedroom detached
+   £520,000
+   Estimated rental income: £2,100 pcm
+   Executive family home. South-facing garden. Double garage. High-yield area.`;
+
+function loadDemo() {
+  document.getElementById('rawText').value = DEMO;
+}
+
+function clearAll() {
+  document.getElementById('rawText').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+  properties = [];
+}
+
+function showStatus(msg) {
+  const sb = document.getElementById('statusBar');
+  sb.style.display = 'flex';
+  document.getElementById('statusText').textContent = msg;
+}
+function hideStatus() { document.getElementById('statusBar').style.display = 'none'; }
+function showError(msg) {
+  const eb = document.getElementById('errorBox');
+  eb.textContent = msg;
+  eb.style.display = 'block';
+}
+
+async function runAnalysis() {
+  const text = document.getElementById('rawText').value.trim();
+  if (!text) { showError('Please paste some property text or load the demo first.'); return; }
+  document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('analyzeBtn').disabled = true;
+  showStatus('Extracting property data with AI...');
+
+  try {
+    const extractRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `You are a property data extraction engine. Extract all properties from the text and return ONLY a JSON array, no markdown, no backticks. Each object must have: id (number), name (short identifier like "3-bed Stretford"), address (string), price (number, GBP, no commas), beds (number, 0 if unknown), type (string: flat/terraced/semi-detached/detached/bungalow/other), rentPcm (number, estimate if not given using 0.55% of price as monthly), notes (one short string of key facts, max 12 words). If rent is not stated, estimate it as price * 0.0055. Return ONLY the JSON array.`,
+        messages: [{ role: 'user', content: text }]
+      })
+    });
+    const extractData = await extractRes.json();
+    let rawJson = extractData.content.map(c => c.text || '').join('');
+    rawJson = rawJson.replace(/```json|```/g, '').trim();
+    properties = JSON.parse(rawJson);
+
+    showStatus('Running investment analysis...');
+    properties = properties.map(p => {
+      const annual = p.rentPcm * 12;
+      const yield_ = ((annual / p.price) * 100);
+      const roi5 = (((annual * 5) + (p.price * 0.15)) / p.price * 100);
+      return { ...p, annual: Math.round(annual), yield: parseFloat(yield_.toFixed(2)), roi5: parseFloat(roi5.toFixed(1)) };
     });
 
-    async function runMobileAnalysis() {
-      const text = document.getElementById('propertyText').value;
-      if(!text) { alert('Please paste some property text first!'); return; }
-      
-      // Show loading elements
-      document.getElementById('resultsDashboard').style.display = 'block';
-      document.getElementById('riskOutput').innerText = "🔄 Scanning property text layout...";
-      document.getElementById('emailDraft').innerText = "🔄 Structuring premium email template...";
-      
-      // 1. Smart UI Local Number Extract Layout Check
-      const priceMatch = text.match(/Price:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+[\d])/);
-      const rentMatch = text.match(/Rent:\s*£?([0-9,]+)/i) || text.match(/£([0-9,]+)\s*pcm/i);
-      
-      let price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 150000;
-      let rent = rentMatch ? parseFloat(rentMatch[1].replace(/,/g, '')) : 1200;
-      
-      let annualRent = rent * 12;
-      let grossYield = (annualRent / price) * 100;
-      
-      document.getElementById('yieldOutput').innerText = `🔥 ${grossYield.toFixed(1)}%`;
-      document.getElementById('annualRentOutput').innerText = `£${annualRent.toLocaleString()}`;
-      
-      // 2. Live OpenAI API Integration Tunnel Connection
-      try {
-        const response = await fetch("https://openai.com", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini", // Blazing fast and ultra cheap
-            messages: [
-              { 
-                role: "system", 
-                content: "You are a professional real estate investment multi-agent system split into a Risk Analyst and an Accountant. Analyze the property text. First, write a one-sentence warning starting with 'RISK SUMMARY:' highlighting hidden flaws (e.g. Grade listings, student turnover, hidden fees). Second, write an email template starting with 'EMAIL DRAFT:' to schedule a property viewing with the estate agents." 
-              },
-              { role: "user", content: `Raw text data: ${text}\nPrice: £${price}, Rent: £${rent}` }
-            ]
-          })
-        });
+    showStatus('Generating AI insights...');
+    const insightRes = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: 'You are a concise property investment analyst. Given a list of properties with yields and prices, write 3-4 sentences of plain-text investment insight. Mention the best yield, any risks (leasehold, high price, service charges), and which property type offers best value. No bullet points, no markdown.',
+        messages: [{ role: 'user', content: JSON.stringify(properties.map(p => ({ name: p.name, price: p.price, yield: p.yield, beds: p.beds, type: p.type, notes: p.notes }))) }]
+      })
+    });
+    const insightData = await insightRes.json();
+    const insights = insightData.content.map(c => c.text || '').join('').trim();
 
-        const data = await response.json();
-        
-        if (data.choices && data.choices[0]) {
-          const aiResponse = data.choices[0].message.content;
-          
-          // Separate the AI response into the Risk box and Email box layout
-          if (aiResponse.includes("EMAIL DRAFT:")) {
-            const parts = aiResponse.split("EMAIL DRAFT:");
-            document.getElementById('riskOutput').innerText = parts[0].replace("RISK SUMMARY:", "").trim();
-            document.getElementById('emailDraft').innerText = parts[1].trim();
-          } else {
-            document.getElementById('riskOutput').innerText = "Analysis Complete.";
-            document.getElementById('emailDraft').innerText = aiResponse;
-          }
-        } else {
-          document.getElementById('riskOutput').innerText = "API Configuration Error";
-          document.getElementById('emailDraft').innerText = "Check your OpenAI credits or Key: " + JSON.stringify(data.error);
-        }
-      } catch (error) {
-        document.getElementById('riskOutput').innerText = "Connection Dropped";
-        document.getElementById('emailDraft').innerText = "Failed to tunnel to OpenAI servers: " + error.message;
-      }
-    }
+    hideStatus();
+    renderResults(insights);
+  } catch(err) {
+    hideStatus();
+    showError('Analysis failed: ' + err.message + '. Check your internet connection.');
+  }
+  document.getElementById('analyzeBtn').disabled = false;
+}
 
-    function copyEmail() {
-      navigator.clipboard.writeText(document.getElementById('emailDraft').innerText);
-      alert('Email copied to clipboard!');
-    }
-  </script>
+function setSort(key) {
+  sortKey = key;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderTable();
+}
+
+function renderResults(insights) {
+  document.getElementById('results').style.display = 'block';
+  renderSummary();
+  renderTopPick();
+  renderTable();
+  document.getElementById('aiInsightsText').textContent = insights;
+  document.getElementById('aiInsights').style.display = insights ? 'block' : 'none';
+  populateEmailSelect();
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderSummary() {
+  const count = properties.length;
+  const avgYield = (properties.reduce((s,p) => s + p.yield, 0) / count).toFixed(1);
+  const minPrice = Math.min(...properties.map(p => p.price));
+  const maxYield = Math.max(...properties.map(p => p.yield));
+  const strip = document.getElementById('summaryStrip');
+  strip.innerHTML = `
+    <div class="summary-card"><div class="sc-label">Properties found</div><div class="sc-val">${count}</div></div>
+    <div class="summary-card"><div class="sc-label">Avg gross yield</div><div class="sc-val" style="color:var(--accent2)">${avgYield}%</div></div>
+    <div class="summary-card"><div class="sc-label">Best yield</div><div class="sc-val" style="color:var(--good)">${maxYield}%</div></div>
+    <div class="summary-card"><div class="sc-label">Lowest price</div><div class="sc-val">£${minPrice.toLocaleString()}</div></div>
+  `;
+}
+
+function renderTopPick() {
+  const best = [...properties].sort((a,b) => b.yield - a.yield)[0];
+  if (!best) return;
+  document.getElementById('topPickTitle').textContent = best.name + ' — best yield pick';
+  document.getElementById('topPickDesc').textContent = `${best.address} · £${best.price.toLocaleString()} · ${best.yield}% gross yield · £${best.annual.toLocaleString()}/yr estimated income. ${best.notes}`;
+  document.getElementById('topPick').style.display = 'flex';
+}
+
+function renderTable() {
+  const sorted = [...properties].sort((a,b) => {
+    if (sortKey === 'price') return a.price - b.price;
+    if (sortKey === 'beds') return b.beds - a.beds;
+    if (sortKey === 'roi') return b.roi5 - a.roi5;
+    return b.yield - a.yield;
+  });
+  const maxYield = Math.max(...properties.map(p => p.yield));
+  const minYield = Math.min(...properties.map(p => p.yield));
+  const minPrice = Math.min(...properties.map(p => p.price));
+  const maxPrice = Math.max(...properties.map(p => p.price));
+
+  document.getElementById('compBody').innerHTML = sorted.map(p => {
+    const yieldClass = p.yield === maxYield ? 'best-val' : p.yield === minYield ? 'worst-val' : '';
+    const priceClass = p.price === minPrice ? 'best-val' : p.price === maxPrice ? 'worst-val' : '';
+    const verdict = p.yield >= 6 ? '<span class="pill pill-good">Strong buy</span>'
+                  : p.yield >= 4.5 ? '<span class="pill pill-warn">Consider</span>'
+                  : '<span class="pill pill-bad">Weak yield</span>';
+    return `<tr>
+      <td><div class="prop-name">${p.name}</div><div class="prop-addr">${p.address}</div></td>
+      <td class="${priceClass}">£${p.price.toLocaleString()}</td>
+      <td>${p.beds || '—'}</td>
+      <td><span class="pill pill-neu">${p.type}</span></td>
+      <td>£${p.rentPcm.toLocaleString()}</td>
+      <td class="${yieldClass}">${p.yield}%</td>
+      <td>£${p.annual.toLocaleString()}</td>
+      <td>${p.roi5}%</td>
+      <td>${verdict}</td>
+    </tr>`;
+  }).join('');
+}
+
+function populateEmailSelect() {
+  const sel = document.getElementById('emailSelect');
+  sel.innerHTML = '<option value="">Select a property...</option>' +
+    properties.map(p => `<option value="${p.id}">${p.name} — £${p.price.toLocaleString()}</option>`).join('');
+}
+
+function showEmail() {
+  const id = parseInt(document.getElementById('emailSelect').value);
+  if (!id && id !== 0) return;
+  const p = properties.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('emailBody').textContent =
+`Subject: Viewing request — ${p.address}
+
+Dear Agent,
+
+I am writing to request a viewing for the property listed at ${p.address}, currently on the market at £${p.price.toLocaleString()}.
+
+I am a cash/mortgage-ready buyer actively looking in this area and I am particularly interested in the investment potential of this property. Could you please confirm the following:
+
+1. Is the property freehold or leasehold? If leasehold, what is the remaining term and annual service/ground charge?
+2. What is the current EPC rating?
+3. Has the property been tenanted recently, and if so, at what monthly rental figure?
+4. Are there any known structural issues or ongoing maintenance works?
+
+I am flexible on viewing times and can accommodate weekday evenings or weekends. Please let me know your earliest available slot.
+
+Many thanks,
+[Your name]
+[Your phone number]`;
+}
+
+function copyEmail() {
+  const text = document.getElementById('emailBody').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('Email copied to clipboard.'));
+}
+</script>
 </body>
 </html>

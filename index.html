@@ -532,7 +532,7 @@ async function runAnalysis() {
   try {
     const extractRes = await fetch('https://proud-hat-22e9.workers.dev', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
@@ -556,7 +556,7 @@ async function runAnalysis() {
     showStatus('Generating AI insights...');
     const insightRes = await fetch('https://proud-hat-22e9.workers.dev', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,

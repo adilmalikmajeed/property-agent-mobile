@@ -530,7 +530,7 @@ async function runAnalysis() {
   showStatus('Extracting property data with AI...');
 
   try {
-    const extractRes = await fetch('https://proud-hat-22e9.workers.dev', {
+    const extractRes = await fetch('https://proud-hat-22e9.adilzclikz.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -554,7 +554,7 @@ async function runAnalysis() {
     });
 
     showStatus('Generating AI insights...');
-    const insightRes = await fetch('https://proud-hat-22e9.workers.dev', {
+    const insightRes = await fetch('https://proud-hat-22e9.adilzclikz.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
